@@ -51,7 +51,7 @@ class ParkingLotTest {
         assertThrows(IllegalArgumentException.class, () -> lot.unPark("123"));
     }
     @Test
-    void testExpectCorrectCarWhenUnParking() {
+    void testExpectCorrectCarWhenUnParking() throws CarNotFoundException {
         ParkingLot lot = new ParkingLot(4);
         Car car = new Car("MH123", "Red");
         lot.park(car);
@@ -62,7 +62,7 @@ class ParkingLotTest {
         ParkingLot lot = new ParkingLot(4);
         Car car = new Car("MH123", "Red");
         lot.park(car);
-        assertThrows(IllegalArgumentException.class, () -> lot.unPark("DL431"));
+        assertThrows(CarNotFoundException.class, () -> lot.unPark("DL431"));
     }
     @Test
     void testCountOfCarsByColor1() {

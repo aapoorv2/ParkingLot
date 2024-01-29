@@ -34,7 +34,7 @@ public class ParkingLot {
             }
         }
     }
-    Car unPark(String registrationNumber) {
+    Car unPark(String registrationNumber) throws CarNotFoundException {
         if (isEmpty()) {
             throw new IllegalArgumentException("Parking is Empty");
         }
@@ -45,7 +45,7 @@ public class ParkingLot {
                 return spotToCar.remove(spot);
             }
         }
-        throw new IllegalArgumentException("Car Not Found");
+        throw new CarNotFoundException("Car Not Found");
     }
     int countAvailableSpots() {
         int count = 0;
