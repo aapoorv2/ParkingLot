@@ -8,7 +8,8 @@ class ParkingSpotTest {
     @Test
     void testIsOccupiedIfSpotIsOccupied() {
         ParkingSpot spot = new ParkingSpot();
-        spot.occupy();
+        Car car = new Car("1234", "Black");
+        spot.park(car);
         assertTrue(spot.isOccupied());
     }
     @Test
