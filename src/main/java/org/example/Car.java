@@ -7,4 +7,10 @@ public class Car {
         this.registrationNumber = registrationNumber;
         this.color = color;
     }
+    String getColor(){
+        return this.color;
+    }
+    String getRegistrationNumber() {
+        return this.registrationNumber;
+    }
 }
