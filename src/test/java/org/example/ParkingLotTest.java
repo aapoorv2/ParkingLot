@@ -14,11 +14,6 @@ class ParkingLotTest {
             ParkingLot lot = new ParkingLot(-2);
         });
     }
-    @Test
-    void testCountAvailableSpots() {
-        ParkingLot lot = new ParkingLot(4);
-        assertEquals(4, lot.countAvailableSpots());
-    }
 
     @Test
     void testParkingACarWhenSpotIsAvailable() {
@@ -27,22 +22,41 @@ class ParkingLotTest {
         assertDoesNotThrow(() -> lot.park(car));
     }
     @Test
+    void testThrowingAnExceptionWhenParkingCarsWithSameRegNumber() {
+        ParkingLot lot = new ParkingLot(4);
+        lot.park(new Car("123", "Red"));
+        assertThrows(RuntimeException.class, () -> lot.park(new Car("123", "Red")));
+    }
+    @Test
     void testThrowingAnExceptionParkingACarWhenSpotsAreNotAvailable() {
         ParkingLot lot = new ParkingLot(4);
         lot.park(new Car("123", "Red"));
-        lot.park(new Car("123", "Red"));
-        lot.park(new Car("123", "Red"));
-        lot.park(new Car("123", "Red"));
-        assertThrows(IllegalArgumentException.class, () -> lot.park(new Car("1234", "Blue")));
+        lot.park(new Car("1234", "Red"));
+        lot.park(new Car("1235", "Red"));
+        lot.park(new Car("1236", "Red"));
+        assertThrows(IllegalArgumentException.class, () -> lot.park(new Car("12324", "Blue")));
     }
+
     @Test
     void testUnParkingACar() {
         ParkingLot lot = new ParkingLot(4);
         Car car1 = new Car("123", "Red");
-        Car car2 = new Car("1234", "Blue");
+        Car car2 = new Car("1236", "Blue");
         lot.park(car1);
         lot.park(car2);
         assertDoesNotThrow(() -> lot.unPark("123"));
+    }
+    @Test
+    void testUnParkingACarVacatesASpot() throws CarNotFoundException {
+        ParkingLot lot = new ParkingLot(4);
+        lot.park(new Car("123", "Red"));
+        lot.park(new Car("1234", "Red"));
+        lot.park(new Car("1235", "Red"));
+        lot.park(new Car("1236", "Red"));
+        lot.unPark("123");
+        assertDoesNotThrow(() -> {
+            lot.park(new Car("123","red"));
+        });
     }
     @Test
     void testThrowingAnExceptionUnParkingACarWhenLotIsEmpty() {

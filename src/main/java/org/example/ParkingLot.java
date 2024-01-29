@@ -22,6 +22,11 @@ public class ParkingLot {
         this.availableSpots = noOfSpots;
     }
     void park(Car car) {
+        for (ParkingSpot spot : spots) {
+            if (spot.isOccupied() && Objects.equals(spotToCar.get(spot).regNo(), car.regNo())) {
+                throw new RuntimeException("A car with the same registration number already exists");
+            }
+        }
         if (isFull()) {
             throw new IllegalArgumentException("Parking is Full");
         }
@@ -46,15 +51,6 @@ public class ParkingLot {
             }
         }
         throw new CarNotFoundException("Car Not Found");
-    }
-    int countAvailableSpots() {
-        int count = 0;
-        for (ParkingSpot spot : spots) {
-            if (!spot.isOccupied()) {
-                count++;
-            }
-        }
-        return count;
     }
     boolean isFull() {
         return availableSpots == 0;

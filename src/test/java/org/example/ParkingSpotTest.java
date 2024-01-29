@@ -17,5 +17,16 @@ class ParkingSpotTest {
         ParkingSpot spot = new ParkingSpot();
         assertFalse(spot.isOccupied());
     }
+    @Test
+    void testThrowsAnExceptionIfParkingOnAnOccupiedSpot() {
+        ParkingSpot spot = new ParkingSpot();
+        Car car = new Car("1234", "Black");
+        spot.park(car);
+
+        assertThrows(RuntimeException.class, () -> {
+            spot.park(car);
+        });
+    }
+
 
 }
