@@ -18,6 +18,13 @@ class ParkingSpotTest {
         assertFalse(spot.isOccupied());
     }
     @Test
+    void testCorrectCarIsReturnedIfUnParkingACar() {
+        ParkingSpot spot = new ParkingSpot();
+        Car car = new Car("MH12", "Blue");
+        String token = spot.park(car);
+        assertEquals(car, spot.unPark(token));
+    }
+    @Test
     void testThrowsAnExceptionIfParkingOnAnOccupiedSpot() {
         ParkingSpot spot = new ParkingSpot();
         Car car = new Car("1234", "Black");
