@@ -1,10 +1,15 @@
 package org.example;
 
 import org.junit.jupiter.api.Test;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.*;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 
 class ParkingAttendantTest {
+    private final PrintStream standardOut = System.out;
+    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
     @Test
     void testThrowsAnExceptionForNonPositiveNumberOfParkingLots() {
         assertThrows(IllegalArgumentException.class, () -> {
@@ -66,6 +71,27 @@ class ParkingAttendantTest {
         assertThrows(RuntimeException.class, () -> {
             attendant2.park(car);
         });
+    }
+
+    @BeforeEach
+    public void setUp() {
+        System.setOut(new PrintStream(outputStreamCaptor));
+    }
+    @Test
+    void testPrintsTheUnavailabilityOfALotWhenItBecomesFull() {
+        ParkingAttendant attendant = new ParkingAttendant(1, 1);
+        attendant.park(new Car("MH123", "Red"));
+        assertEquals("Lot 1 is Full", outputStreamCaptor.toString().trim());
+    }
+    @Test
+    void testPrintsTheAvailabilityOfALotWhenItBecomesAvailable() {
+        ParkingAttendant attendant = new ParkingAttendant(1, 1);
+        attendant.park(new Car("MH123", "Red"));
+        assertEquals("Lot 1 is Full", outputStreamCaptor.toString().trim());
+    }
+    @AfterEach
+    public void tearDown() {
+        System.setOut(standardOut);
     }
 
 }

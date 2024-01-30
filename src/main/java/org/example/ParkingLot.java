@@ -18,20 +18,33 @@ public class ParkingLot {
         this.noOfSpots = noOfSpots;
         this.availableSpots = noOfSpots;
     }
+    ParkingSpot findParkingSpot(Strategy strategy) {
+        if (strategy == Strategy.NEAREST) {
+            for (int i = 0 ; i < noOfSpots ; i++) {
+                ParkingSpot spot = spots[i];
+                if (!spot.isOccupied()) {
+                    return spot;
+                }
+            }
+        } else if (strategy == Strategy.FARTHEST) {
+            for (int i = noOfSpots - 1 ; i >= 0 ; i--) {
+                ParkingSpot spot = spots[i];
+                if (!spot.isOccupied()) {
+                    return spot;
+                }
+            }
+        }
+
+        return null;
+    }
     String park(Car car) {
         if (isFull()) {
             throw new RuntimeException("Parking is Full");
         }
-        String token = "";
-        for (ParkingSpot spot : spots) {
-            if (!spot.isOccupied()) {
-                token = spot.park(car);
-                colorCount.put(car.color(), colorCount.getOrDefault(car.color(), 0) + 1);
-                availableSpots--;
-                break;
-            }
-        }
-        return token;
+        ParkingSpot spot = findParkingSpot(Strategy.NEAREST);
+        colorCount.put(car.color(), colorCount.getOrDefault(car.color(), 0) + 1);
+        availableSpots--;
+        return spot.park(car);
     }
     Car unPark(String token) throws CarNotFoundException {
         if (isEmpty()) {
