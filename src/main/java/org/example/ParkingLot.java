@@ -1,14 +1,12 @@
 package org.example;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class ParkingLot {
     private ParkingSpot[] spots;
     private final int noOfSpots;
-    private Map<ParkingSpot, Car> spotToCar;
     private int availableSpots;
+    Map<String, Integer> colorCount = new HashMap<>();
     ParkingLot(int noOfSpots) {
         if (noOfSpots <= 0) {
             throw new IllegalArgumentException("Number of Slots can't be non positive");
@@ -17,37 +15,34 @@ public class ParkingLot {
         for (int i = 0 ; i < noOfSpots ; i++) {
             this.spots[i] = new ParkingSpot();
         }
-        this.spotToCar = new HashMap<ParkingSpot, Car>();
         this.noOfSpots = noOfSpots;
         this.availableSpots = noOfSpots;
     }
-    void park(Car car) {
-        for (ParkingSpot spot : spots) {
-            if (spot.isOccupied() && Objects.equals(spotToCar.get(spot).regNo(), car.regNo())) {
-                throw new RuntimeException("A car with the same registration number already exists");
-            }
-        }
+    String park(Car car) {
         if (isFull()) {
-            throw new IllegalArgumentException("Parking is Full");
+            throw new RuntimeException("Parking is Full");
         }
+        String token = "";
         for (ParkingSpot spot : spots) {
             if (!spot.isOccupied()) {
-                spot.park(car);
-                spotToCar.put(spot, car);
+                token = spot.park(car);
+                colorCount.put(car.color(), colorCount.getOrDefault(car.color(), 0) + 1);
                 availableSpots--;
                 break;
             }
         }
+        return token;
     }
-    Car unPark(String registrationNumber) throws CarNotFoundException {
+    Car unPark(String token) throws CarNotFoundException {
         if (isEmpty()) {
-            throw new IllegalArgumentException("Parking is Empty");
+            throw new RuntimeException("Parking is Empty");
         }
         for (ParkingSpot spot : spots) {
-            if (spot.isOccupied() && Objects.equals(spotToCar.get(spot).regNo(), registrationNumber)) {
+            if (spot.isOccupied() && spot.isValidToken(token)) {
+                Car car = spot.unPark(token);
+                colorCount.put(car.color(), colorCount.getOrDefault(car.color(), 0) - 1);
                 availableSpots++;
-                spot.unPark();
-                return spotToCar.remove(spot);
+                return car;
             }
         }
         throw new CarNotFoundException("Car Not Found");
@@ -59,13 +54,7 @@ public class ParkingLot {
         return availableSpots == noOfSpots;
     }
     int countCarsByColor(String color) {
-        int count = 0;
-        for (ParkingSpot spot : spots) {
-            if (Objects.equals(spotToCar.get(spot).color(), color)) {
-                count++;
-            }
-        }
-        return count;
+        return colorCount.getOrDefault(color, 0);
     }
 
 }

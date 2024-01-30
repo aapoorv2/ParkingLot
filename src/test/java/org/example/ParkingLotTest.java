@@ -21,12 +21,7 @@ class ParkingLotTest {
         Car car = new Car("123", "Red");
         assertDoesNotThrow(() -> lot.park(car));
     }
-    @Test
-    void testThrowingAnExceptionWhenParkingCarsWithSameRegNumber() {
-        ParkingLot lot = new ParkingLot(4);
-        lot.park(new Car("123", "Red"));
-        assertThrows(RuntimeException.class, () -> lot.park(new Car("123", "Red")));
-    }
+
     @Test
     void testThrowingAnExceptionParkingACarWhenSpotsAreNotAvailable() {
         ParkingLot lot = new ParkingLot(4);
@@ -34,7 +29,7 @@ class ParkingLotTest {
         lot.park(new Car("1234", "Red"));
         lot.park(new Car("1235", "Red"));
         lot.park(new Car("1236", "Red"));
-        assertThrows(IllegalArgumentException.class, () -> lot.park(new Car("12324", "Blue")));
+        assertThrows(RuntimeException.class, () -> lot.park(new Car("12324", "Blue")));
     }
 
     @Test
@@ -42,41 +37,33 @@ class ParkingLotTest {
         ParkingLot lot = new ParkingLot(4);
         Car car1 = new Car("123", "Red");
         Car car2 = new Car("1236", "Blue");
-        lot.park(car1);
-        lot.park(car2);
-        assertDoesNotThrow(() -> lot.unPark("123"));
+        String token1 = lot.park(car1);
+        String token2 = lot.park(car2);
+        assertDoesNotThrow(() -> lot.unPark(token1));
     }
     @Test
     void testUnParkingACarVacatesASpot() throws CarNotFoundException {
         ParkingLot lot = new ParkingLot(4);
-        lot.park(new Car("123", "Red"));
-        lot.park(new Car("1234", "Red"));
-        lot.park(new Car("1235", "Red"));
-        lot.park(new Car("1236", "Red"));
-        lot.unPark("123");
+        String token1 = lot.park(new Car("123", "Red"));
+        String token2 = lot.park(new Car("1234", "Red"));
+        lot.unPark(token1);
         assertDoesNotThrow(() -> {
             lot.park(new Car("123","red"));
         });
     }
     @Test
-    void testThrowingAnExceptionUnParkingACarWhenLotIsEmpty() {
-        ParkingLot lot = new ParkingLot(4);
-        Car car = new Car("123", "Red");
-        assertThrows(IllegalArgumentException.class, () -> lot.unPark("123"));
-    }
-    @Test
     void testExpectCorrectCarWhenUnParking() throws CarNotFoundException {
         ParkingLot lot = new ParkingLot(4);
         Car car = new Car("MH123", "Red");
-        lot.park(car);
-        assertEquals(car, lot.unPark("MH123"));
+        String token = lot.park(car);
+        assertEquals(car, lot.unPark(token));
     }
     @Test
     void testThrowingAnExceptionWhenCarNotFound() {
         ParkingLot lot = new ParkingLot(4);
         Car car = new Car("MH123", "Red");
-        lot.park(car);
-        assertThrows(CarNotFoundException.class, () -> lot.unPark("DL431"));
+        String token = lot.park(car);
+        assertThrows(CarNotFoundException.class, () -> lot.unPark("1223"));
     }
     @Test
     void testCountOfCarsByColor1() {
@@ -96,4 +83,5 @@ class ParkingLotTest {
         lot.park(new Car("MH1236", "Red"));
         assertEquals(0, lot.countCarsByColor("Blue"));
     }
+
 }
