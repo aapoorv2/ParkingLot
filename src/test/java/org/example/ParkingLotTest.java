@@ -104,6 +104,21 @@ class ParkingLotTest {
         parkingLot.unPark(token);
         verify(observer).notify(Event.EMPTY, parkingLot);
     }
-
+    @Test
+    void testAnAttendantShouldOnlyBeNotifiedOfItsParkingSpot() {
+        ParkingAttendant attendant1 = spy(new ParkingAttendant(0, 0));
+        ParkingAttendant attendant2 = spy(new ParkingAttendant(0, 0));
+        ParkingLot lot1 = new ParkingLot(1);
+        ParkingLot lot2 = new ParkingLot(1);
+        attendant1.assign(lot1);
+        attendant2.assign(lot2);
+        Car car1 = new Car("MH123", "Red");
+        Car car2 = new Car("MH1023", "Red");
+        NotificationBus.instance().subscribe(attendant1, Event.FULL);
+        NotificationBus.instance().subscribe(attendant2, Event.FULL);
+        lot1.park(car1, Strategy.NEAREST);
+        verify(attendant1).notify(Event.FULL, lot1);
+        verify(attendant2, never()).notify(Event.FULL, lot2);
+    }
 
 }

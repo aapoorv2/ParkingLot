@@ -25,6 +25,7 @@ public class NotificationBus {
     }
 
     public void subscribe(Subscriber observer, Event event){
+
         subscribers.computeIfAbsent(event, k -> subscribers.getOrDefault(k, new ArrayList<>())).add(observer);
     }
 }

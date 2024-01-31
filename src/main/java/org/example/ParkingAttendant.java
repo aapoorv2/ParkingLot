@@ -42,5 +42,11 @@ public class ParkingAttendant implements Subscriber{
         }
         throw new CarNotFoundException("Car was not found");
     }
-
+    @Override
+    public void notify(Event event, Object publisher) {
+        if (parkingLots.contains((ParkingLot) publisher)) {
+            return;
+        }
+        Subscriber.super.notify(event, publisher);
+    }
 }
