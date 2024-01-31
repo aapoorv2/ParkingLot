@@ -3,7 +3,7 @@ package org.example;
 import java.util.*;
 
 public class ParkingLot {
-    private ParkingSpot[] spots;
+    private List<ParkingSpot> spots;
     private final int noOfSpots;
     private int availableSpots;
     Map<String, Integer> colorCount = new HashMap<>();
@@ -11,39 +11,24 @@ public class ParkingLot {
         if (noOfSpots <= 0) {
             throw new IllegalArgumentException("Number of Slots can't be non positive");
         }
-        this.spots = new ParkingSpot[noOfSpots];
+        this.spots = new ArrayList<>();
         for (int i = 0 ; i < noOfSpots ; i++) {
-            this.spots[i] = new ParkingSpot();
+            this.spots.add(new ParkingSpot());
         }
         this.noOfSpots = noOfSpots;
         this.availableSpots = noOfSpots;
     }
-    ParkingSpot findParkingSpot(Strategy strategy) {
-        if (strategy == Strategy.NEAREST) {
-            for (int i = 0 ; i < noOfSpots ; i++) {
-                ParkingSpot spot = spots[i];
-                if (!spot.isOccupied()) {
-                    return spot;
-                }
-            }
-        } else if (strategy == Strategy.FARTHEST) {
-            for (int i = noOfSpots - 1 ; i >= 0 ; i--) {
-                ParkingSpot spot = spots[i];
-                if (!spot.isOccupied()) {
-                    return spot;
-                }
-            }
-        }
 
-        return null;
-    }
-    String park(Car car) {
+    String park(Car car, Strategy strategy) {
         if (isFull()) {
             throw new RuntimeException("Parking is Full");
         }
-        ParkingSpot spot = findParkingSpot(Strategy.NEAREST);
+        ParkingSpot spot = strategy.findParkingSpot(spots);
         colorCount.put(car.color(), colorCount.getOrDefault(car.color(), 0) + 1);
         availableSpots--;
+        if (isFull()) {
+            notifyLotIsFull();
+        }
         return spot.park(car);
     }
     Car unPark(String token) throws CarNotFoundException {
@@ -54,6 +39,9 @@ public class ParkingLot {
             if (spot.isOccupied() && spot.isValidToken(token)) {
                 Car car = spot.unPark(token);
                 colorCount.put(car.color(), colorCount.getOrDefault(car.color(), 0) - 1);
+                if (isFull()) {
+                    notifyLotIsEmpty();
+                }
                 availableSpots++;
                 return car;
             }
@@ -68,6 +56,12 @@ public class ParkingLot {
     }
     int countCarsByColor(String color) {
         return colorCount.getOrDefault(color, 0);
+    }
+    void notifyLotIsFull() {
+        NotificationBus.instance().publish(this, Event.FULL);
+    }
+    void notifyLotIsEmpty() {
+        NotificationBus.instance().publish(this, Event.EMPTY);
     }
 
 }

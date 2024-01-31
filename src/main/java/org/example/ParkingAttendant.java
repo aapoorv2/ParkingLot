@@ -3,7 +3,7 @@ package org.example;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParkingAttendant {
+public class ParkingAttendant implements Subscriber{
     private List<ParkingLot> parkingLots;
     private int noOfParkingLots;
 
@@ -23,28 +23,20 @@ public class ParkingAttendant {
         this.noOfParkingLots++;
 
     }
-    String park(Car car) {
-        for (int i = 0 ; i < this.noOfParkingLots ; i++) {
-            ParkingLot lot = parkingLots.get(i);
-            if (!lot.isFull()) {
-                String token = lot.park(car);
-                if (lot.isFull()) {
-                    System.out.println("Lot " + (i + 1) + " is Full");
-                }
-                return token;
-            }
+
+    String park(Car car, Strategy strategy) {
+        ParkingLot lot = strategy.findParkingLot(parkingLots);
+        if (lot == null) {
+            throw new RuntimeException("All the parking lots are full");
         }
-        throw new RuntimeException("All the parking lots are full");
+        return lot.park(car, strategy);
+
     }
     Car unPark(String token) throws CarNotFoundException {
         for (int i = 0 ; i < this.noOfParkingLots ; i++) {
             ParkingLot lot = parkingLots.get(i);
-            boolean full = lot.isFull();
             Car car = lot.unPark(token);
             if (car != null) {
-                if (full != lot.isFull()) {
-                    System.out.println("Lot " + (i + 1) + " is available now");
-                }
                 return car;
             }
         }
